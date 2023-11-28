@@ -1,27 +1,26 @@
 import numpy as np
-import cv2
 
-def evaluate_method(all_results, all_labels, width, height, IoU_threshold=0.75):
+def evaluate_method(all_results, all_labels, width, height, max_distance=20):
     
-    image_level_evaluation = np.zeros(len(all_results))
-    person_level_evaluation = np.zeros(len(all_results))
+    image_level_performance = np.zeros(len(all_results))
+    person_level_performance = np.zeros(len(all_results), dtype=object)
 
 
     for idx, (results, labels) in enumerate(zip(all_results, all_labels)):
 
-        image_level, person_level = image_level_evaluation(results, labels), person_level_evaluation(results, labels, width, height, threshold=IoU_threshold)
+        image_level, person_level = image_level_evaluation(results, labels), person_level_evaluation(results, labels, width, height, max_distance=max_distance)
 
-        image_level_evaluation[idx] = image_level
-        person_level_evaluation[idx] = person_level
+        image_level_performance[idx] = image_level
+        person_level_performance[idx] = person_level
 
 
-    image_level_result = np.mean(image_level_evaluation)
+    image_level_result = np.mean(image_level_performance)
 
     person_level_result = {
-        'accuracy': np.mean([person_level['accuracy'] for person_level in person_level_evaluation]),
-        'recall': np.mean([person_level['recall'] for person_level in person_level_evaluation]),
-        'precision': np.mean([person_level['precision'] for person_level in person_level_evaluation]),
-        'f1': np.mean([person_level['f1'] for person_level in person_level_evaluation])
+        'accuracy': np.mean([person_level['accuracy'] for person_level in person_level_performance]),
+        'recall': np.mean([person_level['recall'] for person_level in person_level_performance]),
+        'precision': np.mean([person_level['precision'] for person_level in person_level_performance]),
+        'f1': np.mean([person_level['f1'] for person_level in person_level_performance])
     }
 
     return {
