@@ -124,6 +124,7 @@ def person_level_evaluation(results, labels, width, height, max_distance=20):
 
 
 
+    # Calculate the number of true positives, false positives and false negatives
     for sorted_distances in results_sorted_distances:
 
         if np.all(sorted_distances == np.inf):
@@ -135,6 +136,7 @@ def person_level_evaluation(results, labels, width, height, max_distance=20):
     fn = len(labels) - tp
 
 
+    # Calculate the accuracy, recall, precision and f1 score
     accuracy = float(tp) / (tp + fp + fn)
     recall = float(tp) / (tp + fn)
     precision = float(tp) / (tp + fp)
