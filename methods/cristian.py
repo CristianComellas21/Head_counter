@@ -98,7 +98,7 @@ def locate_people(image, threshold=100, min_area=800, max_area=15000):
 
 
     # gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)[:, :, 0]
+    gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)[:, :, 1]
     
     diff_image = np.abs(gray_image - GRAY_REFERENCE_IMAGE)
 
@@ -118,8 +118,6 @@ def locate_people(image, threshold=100, min_area=800, max_area=15000):
 
     # Count connected components
     (n_components, labels, stats, centroids) = cv2.connectedComponentsWithStats(canny_image)
-
-    # print(n_components, labels.shape, stats.shape, centroids.shape)
     
 
     x = np.zeros((n_components), dtype=np.int32)
