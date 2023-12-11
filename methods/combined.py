@@ -53,22 +53,42 @@ def locate_people(image, threshold=100, stride=90, patch_size=(200, 200), aspect
     """
     Locate people in an image.
     """
+
+    # # Apply gamma correction to the image
+    # image = (np.power(image / 255, 1 / 1.5) * 255).astype(np.uint8)
+
+    # Convert image to HSV and extract H, S and V channels
     image_aux = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     h, s, v = image_aux[:, :, 0], image_aux[:, :, 1], image_aux[:, :, 2]
 
     # Take blue watter from the image using mask from H of HSV
     water_mask = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
     water_mask[(h > 70) & (h < 140) & (s > 50)] = 0
-    water_mask = cv2.erode(water_mask, np.ones((3, 3), dtype=np.uint8), iterations=1)
+    water_mask = cv2.dilate(water_mask, np.ones((15, 15), dtype=np.uint8), iterations=1)
 
     # Take sand from the image using mask from H of HSV
     sand_mask = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
-    sand_mask[(h > 0) & (h < 40) & (s < 37)] = 0
-    sand_mask = cv2.erode(sand_mask, np.ones((3, 3), dtype=np.uint8), iterations=1)
+    # sand_mask[(h >= 0) & (h < 40) & (s < 37)] = 0
+    sand_mask[(((h >= 150) & (h <= 180)) | ((h >= 0) & (h <= 40))) & (s < 70)] = 0
+    sand_mask = cv2.dilate(sand_mask, np.ones((5, 5), dtype=np.uint8), iterations=1)
+
+    # Take shadow sand from the image using mask from H of HSV
+    shadow_sand_mask = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
+    shadow_sand_mask[(h > 90) & (h < 124) & (s < 70)] = 0
+    # Take only the bottom-right part of this mask
+    shadow_sand_mask[:650, :1600] = 1
+    shadow_sand_mask = cv2.erode(shadow_sand_mask, np.ones((25, 25), dtype=np.uint8), iterations=1)
+
+    # __plot_debug(image, debug=True)
+    # __plot_debug(water_mask, debug=True)
+    # __plot_debug(sand_mask & shadow_sand_mask, debug=True)
+    # __plot_debug(sand_mask, debug=True)
+    # __plot_debug(shadow_sand_mask, debug=True)
 
     mask = MASK.copy()
     mask *= water_mask
     mask *= sand_mask
+    mask *= shadow_sand_mask
 
     gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)[:, :, 0]
 
@@ -80,10 +100,12 @@ def locate_people(image, threshold=100, stride=90, patch_size=(200, 200), aspect
     # Apply mask to thresholded image
     thresholded_image *= mask
 
+    # Apply canny edge detection to thresholded image
     canny_image = cv2.Canny(thresholded_image, 100, 200)
 
     # Apply close operation to thresholded image
     canny_image = cv2.morphologyEx(canny_image, cv2.MORPH_CLOSE, np.ones((5, 5), dtype=np.uint8), iterations=1)
+
 
     all_bounding_boxes = []
     # Loop through patches in the image
