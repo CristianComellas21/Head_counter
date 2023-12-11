@@ -85,7 +85,7 @@ def locate_people(image, threshold=100, stride=90, patch_size=(200, 200), aspect
     shadow_sand_mask[(h > 90) & (h < 124) & (s < 70)] = 0
     # Take only the bottom-right part of this mask
     shadow_sand_mask[:650, :1600] = 1
-    shadow_sand_mask = cv2.erode(shadow_sand_mask, np.ones((25, 25), dtype=np.uint8), iterations=1)
+    shadow_sand_mask = cv2.erode(shadow_sand_mask, np.ones((31, 31), dtype=np.uint8), iterations=1)
 
     # __plot_debug(image, debug=True)
     # __plot_debug(water_mask, debug=True)
