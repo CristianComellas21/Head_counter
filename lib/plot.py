@@ -19,4 +19,11 @@ def __plot_result(image, results, labels, ax, i):
     ax[i+1].axis('off')
     ax[i+1].set_title('Result ({} people)'.format(len(results)))
     
+def plot_results_different_figures(images, all_results, all_labels):
+    
+    for i, (image, results, labels) in enumerate(zip(images, all_results, all_labels)):
+        fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+        __plot_result(image, results, labels, axs, 0)
+        plt.show()
+    
     
