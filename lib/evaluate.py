@@ -20,12 +20,24 @@ def evaluate_method(all_results, all_labels, width, height, max_distance=20):
         'accuracy': np.mean([person_level['accuracy'] for person_level in person_level_performance]),
         'recall': np.mean([person_level['recall'] for person_level in person_level_performance]),
         'precision': np.mean([person_level['precision'] for person_level in person_level_performance]),
-        'f1': np.mean([person_level['f1'] for person_level in person_level_performance])
+        'f1': np.mean([person_level['f1'] for person_level in person_level_performance]),
+        'accuracy_std': np.std([person_level['accuracy'] for person_level in person_level_performance]),
+        'recall_std': np.std([person_level['recall'] for person_level in person_level_performance]),
+        'precision_std': np.std([person_level['precision'] for person_level in person_level_performance]),
+        'f1_std': np.std([person_level['f1'] for person_level in person_level_performance]),
     }
 
     return {
-        'image_level': image_level_result,
-        'person_level': person_level_result
+        'image_level': {
+            "array": image_level_performance,
+            "value": image_level_result
+        },
+        'person_level': {
+            "tp": [person_level['tp'] for person_level in person_level_performance],
+            "fp": [person_level['fp'] for person_level in person_level_performance],
+            "fn": [person_level['fn'] for person_level in person_level_performance],
+            "metrics": person_level_result
+        }
     
     }
         
@@ -146,5 +158,8 @@ def person_level_evaluation(results, labels, width, height, max_distance=20):
         'accuracy': accuracy,
         'recall': recall,
         'precision': precision,
-        'f1': f1
+        'f1': f1,
+        'tp': tp,
+        'fp': fp,
+        'fn': fn
     }
