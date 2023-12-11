@@ -54,8 +54,10 @@ def locate_people(image, threshold=100, stride=90, patch_size=(200, 200), aspect
     Locate people in an image.
     """
 
-    # # Apply gamma correction to the image
-    # image = (np.power(image / 255, 1 / 1.5) * 255).astype(np.uint8)
+    # Apply gamma correction to the image
+    # gamma = 1.3
+    # original_image = image.copy()
+    # image = (np.power(image/255, 1 / gamma)*255).astype(np.uint8)
 
     # Convert image to HSV and extract H, S and V channels
     image_aux = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
@@ -63,14 +65,20 @@ def locate_people(image, threshold=100, stride=90, patch_size=(200, 200), aspect
 
     # Take blue watter from the image using mask from H of HSV
     water_mask = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
-    water_mask[(h > 70) & (h < 140) & (s > 50)] = 0
-    water_mask = cv2.dilate(water_mask, np.ones((15, 15), dtype=np.uint8), iterations=1)
+    water_mask[(h > 60) & (h < 120)] = 0
+    # Take only the top
+    water_mask[600:] = 1
+
 
     # Take sand from the image using mask from H of HSV
     sand_mask = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
-    # sand_mask[(h >= 0) & (h < 40) & (s < 37)] = 0
-    sand_mask[(((h >= 150) & (h <= 180)) | ((h >= 0) & (h <= 40))) & (s < 70)] = 0
-    sand_mask = cv2.dilate(sand_mask, np.ones((5, 5), dtype=np.uint8), iterations=1)
+    sand_mask[(((h >= 150) & (h <= 180)) | ((h >= 0) & (h <= 40))) & (s < 78)] = 0
+    # Close small holes using a close operation
+    # sand_mask = cv2.morphologyEx(sand_mask, cv2.MORPH_CLOSE, np.ones((5, 5), dtype=np.uint8), iterations=1)
+
+    sand_mask = cv2.dilate(sand_mask, np.ones((7, 7), dtype=np.uint8), iterations=1)
+
+
 
     # Take shadow sand from the image using mask from H of HSV
     shadow_sand_mask = np.ones((image.shape[0], image.shape[1]), dtype=np.uint8)
@@ -89,6 +97,9 @@ def locate_people(image, threshold=100, stride=90, patch_size=(200, 200), aspect
     mask *= water_mask
     mask *= sand_mask
     mask *= shadow_sand_mask
+
+    # __plot_debug(image, debug=True)
+    # __plot_debug(mask, debug=True)
 
     gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)[:, :, 0]
 
