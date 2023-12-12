@@ -8,7 +8,6 @@ import pandas as pd
 
 REFERENCE_IMAGE = cv2.imread("images/1660626000.jpg")
 REFERENCE_IMAGE = cv2.cvtColor(REFERENCE_IMAGE, cv2.COLOR_BGR2RGB)
-# GRAY_REFERENCE_IMAGE = cv2.cvtColor(REFERENCE_IMAGE, cv2.COLOR_RGB2GRAY)
 GRAY_REFERENCE_IMAGE = cv2.cvtColor(REFERENCE_IMAGE, cv2.COLOR_RGB2HSV)[:, :, 0]
 
 # --- Auxiliary functions ---
