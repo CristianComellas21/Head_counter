@@ -21,6 +21,7 @@ def __plot_result(image, results, labels, ax, i, save_images=False, save_path=Pa
         image_copy = image.copy()
         for x, y in zip(labels['x'], labels['y']):
             cv2.circle(image_copy, (int(x), int(y)), 5, (255, 0, 0), -1)
+        image_copy = cv2.cvtColor(image_copy, cv2.COLOR_RGB2BGR)
         cv2.imwrite(str(save_path / 'ground_truth_{}.png'.format(i)), image_copy)
 
     
@@ -34,6 +35,7 @@ def __plot_result(image, results, labels, ax, i, save_images=False, save_path=Pa
         image_copy = image.copy()
         for x, y in zip(results['x'], results['y']):
             cv2.circle(image_copy, (int(x), int(y)), 5, (0, 0, 255), -1)
+        image_copy = cv2.cvtColor(image_copy, cv2.COLOR_RGB2BGR)
         cv2.imwrite(str(save_path / 'final_result{}.png'.format(i)), image_copy)
 
     
